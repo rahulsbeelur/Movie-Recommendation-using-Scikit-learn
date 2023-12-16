@@ -1,0 +1,87 @@
+<!-- index.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Recommender</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div style="display: flex; flex-direction: row; justify-content: center; align-self: center;">
+        <h1>Movie Recommender</h1>
+    </div>
+    <form id="recommendForm">
+        <div style="display: flex; flex-direction: column;">
+            <label for="movie_name">Enter movie name:</label>
+            <input type="text" id="movie_name" name="movie_name" style="width: 400px; margin: auto;" required>
+        </div>
+        <div style="margin-top: 20px;">
+            <button type="button" onclick="getRecommendations()">Get Recommendations</button>
+        </div>
+    </form>
+    <div class="recommendations-parent">
+        <div id="recommendationsContainer" style="display: none;">
+            <div id="recommendations">
+                <!-- Recommendations will be dynamically updated here -->
+                <h2 id="recommendationsHeading">Recommended Movies:</h2>
+                <table class="recommendations-table">
+                    <thead>
+                        <tr>
+                            <th>Movie</th>
+                            <th>Similarity Score</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recommendationsTableBody">
+                        <!-- Recommendations will be dynamically added here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>  
+    
+    <script>
+        function getRecommendations() {
+            var movieName = document.getElementById('movie_name').value;
+    
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/recommend', true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4) {
+                    // Clear previous recommendations
+                    document.getElementById('recommendationsTableBody').innerHTML = "";
+    
+                    // Check if recommendations are available
+                    var recommendationsContainer = document.getElementById('recommendationsContainer');
+                    var recommendationsHeading = document.getElementById('recommendationsHeading');
+    
+                    if (xhr.status == 200) {
+                        // Append new recommendations
+                        var recommendationsTableBody = document.getElementById('recommendationsTableBody');
+                        recommendationsTableBody.innerHTML = xhr.responseText;
+    
+                        // Show recommendations container and heading
+                        recommendationsContainer.style.display = 'block';
+                        recommendationsHeading.style.display = 'block';
+                    } else {
+                        // Show message when no recommendations
+                        recommendationsContainer.style.display = 'none';
+                        recommendationsHeading.style.display = 'none';
+                        alert("No similar movies in the database.");
+                    }
+                }
+            };
+            xhr.send('movie_name=' + encodeURIComponent(movieName));
+        }
+    
+        document.getElementById('recommendForm').addEventListener('submit', function (event) {
+            // Prevent default form submission behavior
+            event.preventDefault();
+            getRecommendations();
+        });
+    </script>
+    
+</body>
+</html>
