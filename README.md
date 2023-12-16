@@ -35,3 +35,6 @@ This Movie Recommender is a Flask web application that suggests movies based on 
 ## Proof of Concept
 
 This project demonstrates the application of cosine similarity in recommending movies based on user input. The web interface is user-friendly, allowing users to receive movie recommendations effortlessly.
+
+## Hosting
+The Movie Recommender project is hosted on pythonanywhere, offering free-tier seamless hosting.
