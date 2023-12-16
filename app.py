@@ -37,16 +37,9 @@ def preprocess_title(title):
 
 def get_index_from_title(title):
     title = preprocess_title(title)
-    
-    title_without_hyphens = title.replace("-", "")
-
-    df['cleaned_title'] = df['title'].apply(lambda x: preprocess_title(x).replace("-", ""))
-    
-    matching_indices = df[df['cleaned_title'].str.contains(title_without_hyphens)].index
-    
+    matching_indices = df[df['title'].str.replace(" ", "").str.lower().str.contains(title)].index
     if not matching_indices.empty and len(matching_indices) > 0:
         return matching_indices[0]
-    
     return None
 
 @app.route('/')
@@ -56,6 +49,8 @@ def index():
 @app.route('/recommend', methods=['POST'])
 def recommend():
     movie_user_likes = request.form['movie_name']
+    # Get the selected number of recommendations
+    num_recommendations = int(request.form['num_recommendations'])
 
     movie_index = get_index_from_title(movie_user_likes)
 
@@ -64,7 +59,7 @@ def recommend():
 
         sorted_similar_movies = sorted(similar_movies, key=lambda x: x[1], reverse=True)
 
-        recommended_movies = [(get_title_from_index(movie[0]), round(movie[1] * 100, 2)) for movie in sorted_similar_movies[:10]]
+        recommended_movies = [(get_title_from_index(movie[0]), round(movie[1] * 100, 2)) for movie in sorted_similar_movies[:num_recommendations]]
 
         recommendations_html = ""
         for movie in recommended_movies:
@@ -73,7 +68,6 @@ def recommend():
         return recommendations_html
     else:
         return "<p>No similar movies in the dataset.</p>"
-
 
 if __name__ == '__main__':
     app.run(debug=True)
