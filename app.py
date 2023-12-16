@@ -2,16 +2,18 @@ from flask import Flask, render_template, request
 import pandas as pd
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+import os
 
 app = Flask(__name__)
 
-# Step 1: Reading CSV File
-df = pd.read_csv("movie_dataset.csv")
+current_directory = os.path.dirname(os.path.abspath(__file__))
 
-# Step 2: Selecting features
+csv_file_path = os.path.join(current_directory, 'movie_dataset.csv')
+
+df = pd.read_csv(csv_file_path)
+
 features = ['keywords', 'cast', 'genres', 'director']
 
-# Step 3: Create a column in DF which combines all selected features
 for feature in features:
     df[feature] = df[feature].fillna(' ')
 
@@ -23,12 +25,10 @@ def combine_features(row):
 
 df["combined_features"] = df.apply(combine_features, axis=1)
 
-# Create count matrix and compute cosine similarity outside the route
 cv = CountVectorizer()
 count_matrix = cv.fit_transform(df["combined_features"])
 cosine_sim = cosine_similarity(count_matrix)
 
-# Functions
 def get_title_from_index(index):
     return df[df.index == index]["title"].values[0]
 
@@ -37,38 +37,35 @@ def preprocess_title(title):
 
 def get_index_from_title(title):
     title = preprocess_title(title)
-    matching_indices = df[df['title'].str.replace(" ", "").str.lower().str.contains(title)].index
+    
+    title_without_hyphens = title.replace("-", "")
+
+    df['cleaned_title'] = df['title'].apply(lambda x: preprocess_title(x).replace("-", ""))
+    
+    matching_indices = df[df['cleaned_title'].str.contains(title_without_hyphens)].index
+    
     if not matching_indices.empty and len(matching_indices) > 0:
         return matching_indices[0]
+    
     return None
-
-# Your existing routes and Flask application code...
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
-# app.py
-
-# ... (your existing Flask app code)
-
 @app.route('/recommend', methods=['POST'])
 def recommend():
     movie_user_likes = request.form['movie_name']
 
-    # Step 6: Getting index of this movie from its title
     movie_index = get_index_from_title(movie_user_likes)
 
     if movie_index is not None:
         similar_movies = list(enumerate(cosine_sim[movie_index]))
 
-        # Step 7: Getting a list of similar movies in descending order of similarity score
         sorted_similar_movies = sorted(similar_movies, key=lambda x: x[1], reverse=True)
 
-        # Step 8: Extracting titles and normalized similarity scores of first 10 movies
         recommended_movies = [(get_title_from_index(movie[0]), round(movie[1] * 100, 2)) for movie in sorted_similar_movies[:10]]
 
-        # Format recommendations as HTML table rows
         recommendations_html = ""
         for movie in recommended_movies:
             recommendations_html += f"<tr><td>{movie[0]}</td><td>{movie[1]}%</td></tr>"
