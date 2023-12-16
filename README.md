@@ -17,7 +17,7 @@ This Movie Recommender is a Flask web application that suggests movies based on 
 1. Clone the repository.
 
    ```bash
-   git clone https://github.com/your-username/movie-recommender.git
+   git clone https://github.com/rahulsbeelur/Movie-Recommendation-using-Scikit-learn.git
    ```
 
 2. Install dependencies
