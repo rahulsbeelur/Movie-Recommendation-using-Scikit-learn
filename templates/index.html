@@ -40,11 +40,22 @@
             </div>
         </div>
     </div>  
+
+    <footer class="fixed-footer">
+        <div class="footer-content">
+            <p>&copy; 2021 Rahul S Beelur</p>
+            <div class="social-links">
+                <a href="https://www.linkedin.com/in/rahul-beelur" target="_blank">LinkedIn</a>
+                <a href="https://github.com/rahulsbeelur" target="_blank">GitHub</a>
+                <a href="https://rahulsbeelur.vercel.app" target="_blank">Digital Portfolio</a>
+            </div>
+        </div>
+    </footer>
     
     <script>
         function getRecommendations() {
             var movieName = document.getElementById('movie_name').value;
-    
+
             var xhr = new XMLHttpRequest();
             xhr.open('POST', '/recommend', true);
             xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
@@ -52,16 +63,16 @@
                 if (xhr.readyState == 4) {
                     // Clear previous recommendations
                     document.getElementById('recommendationsTableBody').innerHTML = "";
-    
+
                     // Check if recommendations are available
                     var recommendationsContainer = document.getElementById('recommendationsContainer');
                     var recommendationsHeading = document.getElementById('recommendationsHeading');
-    
+
                     if (xhr.status == 200) {
                         // Append new recommendations
                         var recommendationsTableBody = document.getElementById('recommendationsTableBody');
                         recommendationsTableBody.innerHTML = xhr.responseText;
-    
+
                         // Show recommendations container and heading
                         recommendationsContainer.style.display = 'block';
                         recommendationsHeading.style.display = 'block';
@@ -75,13 +86,12 @@
             };
             xhr.send('movie_name=' + encodeURIComponent(movieName));
         }
-    
+
         document.getElementById('recommendForm').addEventListener('submit', function (event) {
             // Prevent default form submission behavior
             event.preventDefault();
             getRecommendations();
         });
     </script>
-    
 </body>
 </html>
