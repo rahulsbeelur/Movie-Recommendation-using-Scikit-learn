@@ -1,3 +1,5 @@
+[Deployed Link](https://rahulbeelur.pythonanywhere.com/)
+
 This Movie Recommender is a Flask web application that suggests movies based on user input. It utilizes natural language processing and cosine similarity to recommend movies with similar features. The backend, built with Python, employs pandas for data manipulation and scikit-learn for text vectorization.
 
 ## Features
